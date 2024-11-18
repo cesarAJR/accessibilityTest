@@ -30,7 +30,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
@@ -38,6 +37,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.cesar.accessibilitytest.dialog.DialogGeneral
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,6 +68,11 @@ fun LoginScreen(
     var passwordColorString by remember {
         mutableStateOf("b")
     }
+
+    val showDialog = remember {
+        mutableStateOf(false)
+    }
+
 
 
 
@@ -103,10 +108,6 @@ fun LoginScreen(
         )
         Spacer(modifier = Modifier.height(10.dp))
         Text(
-            modifier =
-                    Modifier.semantics {
-                    this.contentDescription="Inicia Sesión"
-                },
             text = "Inicia Sesión",
             fontSize = 24.sp,
             style = TextStyle(color = Color.Black),
@@ -203,24 +204,31 @@ fun LoginScreen(
         Spacer(modifier = Modifier.height(50.dp))
         Button(modifier = Modifier
             .semantics {
-                onClick(label = "iniciar sesion",action = {onLogin()})
+                onClick(label = "iniciar sesion", action = {
+                    if (userText.isEmpty() || passwordText.isEmpty()){
+                        showDialog.value = true
+                        true
+                    }else{
+                        onLogin()
+                    }
+                })
             }
             .fillMaxWidth()
             .height(50.dp)
             .padding(horizontal = 30.dp),
             shape = RoundedCornerShape(10),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black
+                containerColor = Color(android.graphics.Color.parseColor("#00668B"))
             ),
             onClick = {
-                onLogin()
+                if (userText.isEmpty() || passwordText.isEmpty()){
+                    showDialog.value = true
+                }else{
+                    onLogin()
+                }
             }
         ) {
             Text(
-                modifier =
-                Modifier.semantics {
-                    this.contentDescription="ingresa"
-                },
                 text = "INGRESA",
                 style = TextStyle(
                     color = Color.White,
@@ -228,6 +236,11 @@ fun LoginScreen(
                 )
             )
         }
+
+        if (showDialog.value){
+            DialogGeneral(showDialog)
+        }
+
         Spacer(modifier = Modifier.height(50.dp))
     }
 }
